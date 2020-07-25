@@ -15,9 +15,13 @@ import (
 
 type Status struct {}
 
+type Options struct {
+	Namespace string
+}
+
 var logger = log.Log
 
-func New() *Status {
+func New(options Options) *Status {
 	return new(Status)
 }
 
@@ -33,6 +37,9 @@ func (s *Status) Run() error {
 	c2,err := clientcmd.NewClientConfigFromBytes(bytes)
 
 	c3, err := c2.RawConfig()
+
+	//cmd.Flags().GetString("namespace")
+
 
 	for k,_ := range c3.Clusters {
 		logger.Info().Msgf(k)
