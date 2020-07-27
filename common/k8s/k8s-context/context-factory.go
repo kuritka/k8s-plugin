@@ -11,7 +11,7 @@ type contextFactory struct {
 	args []string
 }
 
-func NewContextFactory(args []string) *contextFactory{
+func NewContextFactory(args []string) *contextFactory {
 	return &contextFactory{
 		args: args,
 	}

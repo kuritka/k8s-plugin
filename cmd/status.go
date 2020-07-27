@@ -1,9 +1,9 @@
 package cmd
 
 import (
+	"github.com/kuritka/plugin/cmd/internal/runner"
 	"github.com/kuritka/plugin/common/guard"
 	k8sctx "github.com/kuritka/plugin/common/k8s/k8s-context"
-	"github.com/kuritka/plugin/runner"
 	"github.com/kuritka/plugin/status"
 	"github.com/spf13/cobra"
 )
