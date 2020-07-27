@@ -3,7 +3,7 @@ package cmd
 import (
 	"github.com/kuritka/plugin/cmd/internal/runner"
 	"github.com/kuritka/plugin/common/guard"
-	k8sctx "github.com/kuritka/plugin/common/k8s/k8s-context"
+	k8sctx2 "github.com/kuritka/plugin/common/k8sctx"
 	"github.com/kuritka/plugin/status"
 	"github.com/spf13/cobra"
 )
@@ -19,7 +19,7 @@ var statusCmd = &cobra.Command{
 
 	Run: func(cmd *cobra.Command, args []string) {
 		var err error
-		statusOptions.Context,err = k8sctx.NewContextFactory(args).Get()
+		statusOptions.Context,err = k8sctx2.NewContextFactory(args).Get()
 		guard.FailOnError(err,"error when building command context")
 		status := status.New(statusOptions)
 		runner.New(status).MustRun()

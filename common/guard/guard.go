@@ -10,6 +10,6 @@ var logger = log.Log
 //FailOnError panics when error occurs.
 func FailOnError(err error, message string, v ...interface{}) {
 	if err != nil {
-		logger.Panic().Err(err).Msgf(message, v)
+		logger.Fatal().Err(err).Msgf(message, v)
 	}
 }
