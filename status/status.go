@@ -1,54 +1,35 @@
 package status
 
 import (
-	"io/ioutil"
+	k8sctx "github.com/kuritka/plugin/common/k8s/k8s-context"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/clientcmd"
-	//"k8s.io/kubernetes/pkg/util/env"
 
 	"github.com/kuritka/plugin/common/log"
-
-	"os"
-	"path/filepath"
 )
 
-type Status struct {}
+type Status struct {
+	options Options
+}
 
 type Options struct {
 	Namespace string
+	Context *k8sctx.Context
 }
 
 var logger = log.Log
 
 func New(options Options) *Status {
-	return new(Status)
+	return &Status{
+		options,
+	}
 }
 
 func (s *Status) Run() error {
-
-	kubeconfig := filepath.Join(os.Getenv("HOME"), ".kube", "config")
-	logger.Info().Msgf("Using kubeconfig file: ", kubeconfig)
-	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
-	bytes, err := ioutil.ReadFile(kubeconfig)
-	if err != nil {
-		return err
-	}
-	c2,err := clientcmd.NewClientConfigFromBytes(bytes)
-
-	c3, err := c2.RawConfig()
-
-	//cmd.Flags().GetString("namespace")
-
-
-	for k,_ := range c3.Clusters {
+	for k,_ := range s.options.Context.K8s.RawConfig.Clusters {
 		logger.Info().Msgf(k)
 	}
-
-	if err != nil {
-		return err
-	}
-	clientset, err := kubernetes.NewForConfig(config)
+	clientset, err := kubernetes.NewForConfig(s.options.Context.K8s.RestConfig)
 	if err != nil {
 		return err
 	}

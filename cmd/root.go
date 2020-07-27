@@ -5,36 +5,17 @@
 package cmd
 
 import (
-	"context"
-	"k8s.io/client-go/tools/clientcmd/api"
 	"os"
 
 	"github.com/kuritka/plugin/common/log"
 
 	"github.com/spf13/cobra"
-	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
 
-type commandLineContext struct{
-	configFlags *genericclioptions.ConfigFlags
-
-	resultingContext     *api.Context
-	resultingContextName string
-
-	rawConfig      api.Config
-	listNamespaces bool
-	args           []string
-
-	genericclioptions.IOStreams
-}
 
 var (
 	logger = log.Log
-	rootContext, rootContextCancel = context.WithCancel(context.Background())
-	commandContext = commandLineContext{
-		configFlags: genericclioptions.NewConfigFlags(true),
-		IOStreams: genericclioptions.IOStreams{In: os.Stdin, Out: os.Stdout, ErrOut: os.Stderr},
-	}
+
 	//Verbose output
 	 Verbose bool
 )
@@ -61,7 +42,6 @@ func init() {
 
 //Execute runs concrete command
 func Execute() {
-
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}

@@ -1,14 +1,15 @@
 package cmd
 
 import (
-	"fmt"
+	"github.com/kuritka/plugin/common/guard"
+	k8sctx "github.com/kuritka/plugin/common/k8s/k8s-context"
 	"github.com/kuritka/plugin/runner"
 	"github.com/kuritka/plugin/status"
 	"github.com/spf13/cobra"
 )
 
 
-var statusCmdOptions status.Options
+var statusOptions status.Options
 
 var statusCmd = &cobra.Command{
 	Use:   "status",
@@ -17,16 +18,17 @@ var statusCmd = &cobra.Command{
 	//Long:  ``,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		k8sContext,_ := commandContext.configFlags.ToRawKubeConfigLoader().RawConfig()
-		fmt.Println(k8sContext)
-		status := status.New(statusCmdOptions)
+		var err error
+		statusOptions.Context,err = k8sctx.NewContextFactory(args).Get()
+		guard.FailOnError(err,"error when building command context")
+		status := status.New(statusOptions)
 		runner.New(status).MustRun()
 	},
 }
 
 func init() {
 	//TODO: fix description
-	statusCmd.Flags().StringVarP(&statusCmdOptions.Namespace, "namespace", "n", "default", "k8gb namespace")
+	statusCmd.Flags().StringVarP(&statusOptions.Namespace, "namespace", "n", "default", "k8gb namespace")
 	statusCmd.MarkFlagRequired("namespace")
 	rootCmd.AddCommand(statusCmd)
 }
