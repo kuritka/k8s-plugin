@@ -34,12 +34,18 @@ func (s *Status) Run() error {
 	if err != nil {
 		return err
 	}
-	ns, err := clientset.CoreV1().Namespaces().List(metav1.ListOptions{})
+	//ns, err := clientset.CoreV1().Namespaces().List(metav1.ListOptions{})
+	//if err != nil {
+	//	return err
+	//}
+	//
+	ing, err := clientset.NetworkingV1beta1().Ingresses(s.options.Namespace).List(metav1.ListOptions{})
 	if err != nil {
 		return err
 	}
 
-	for _,n := range ns.Items {
+
+	for _,n := range ing.Items {
 		logger.Info().Msgf("%s %s",n.ClusterName, n.Name)
 	}
 	return nil
