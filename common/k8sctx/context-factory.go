@@ -7,17 +7,20 @@ import (
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
 
-type contextFactory struct {
+//ContextFactory keeps k8s context
+type ContextFactory struct {
 	args []string
 }
 
-func NewContextFactory(args []string) *contextFactory {
-	return &contextFactory{
+//NewContextFactory returns context of command
+func NewContextFactory(args []string) *ContextFactory {
+	return &ContextFactory{
 		args: args,
 	}
 }
 
-func (cf *contextFactory) Get() ( *Context, error){
+//Get returns context
+func (cf *ContextFactory) Get() ( *Context, error){
 	var err error
 	ctx := new(Context)
 	ctx.Command = new(Command)

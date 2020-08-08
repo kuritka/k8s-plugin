@@ -8,10 +8,12 @@ import (
 	"github.com/kuritka/plugin/common/log"
 )
 
+//Status command structure
 type Status struct {
 	options Options
 }
 
+//Options input vars for command
 type Options struct {
 	Namespace string
 	Context *k8sctx2.Context
@@ -19,28 +21,30 @@ type Options struct {
 
 var logger = log.Log
 
+//New returns Status service implementation
 func New(options Options) *Status {
 	return &Status{
 		options,
 	}
 }
 
+//Run runs the command implementation
 func (s *Status) Run() error {
 	logger.Info().Msgf(s.options.Namespace)
-	for k,_ := range s.options.Context.K8s.RawConfig.Clusters {
+	for k := range s.options.Context.K8s.RawConfig.Clusters {
 		logger.Info().Msgf(k)
 	}
-	clientset, err := kubernetes.NewForConfig(s.options.Context.K8s.RestConfig)
+	cs, err := kubernetes.NewForConfig(s.options.Context.K8s.RestConfig)
 	if err != nil {
 		return err
 	}
-	//ns, err := clientset.CoreV1().Namespaces().List(metav1.ListOptions{})
+	//ns, err := cs.CoreV1().Namespaces().List(metav1.ListOptions{})
 	//if err != nil {
 	//	return err
 	//}
 	//
 	//package api from k8gb import here...
-	ing, err := clientset.NetworkingV1beta1().Ingresses(s.options.Namespace).List(metav1.ListOptions{})
+	ing, err := cs.NetworkingV1beta1().Ingresses(s.options.Namespace).List(metav1.ListOptions{})
 	if err != nil {
 		return err
 	}

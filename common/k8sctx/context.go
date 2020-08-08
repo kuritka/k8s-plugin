@@ -8,6 +8,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd/api"
 )
 
+//K8s contains k8s context
 type K8s struct {
 	ResultingContext     *api.Context
 	ResultingContextName string
@@ -18,12 +19,14 @@ type K8s struct {
 	genericclioptions.IOStreams
 }
 
+//Command contains command
 type Command struct {
 	Args           []string
 	Context context.Context
 	Cancel context.CancelFunc
 }
 
+//Context contains fill command context
 type Context struct{
 	K8s *K8s
 	Command *Command

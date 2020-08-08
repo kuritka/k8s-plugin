@@ -5,20 +5,22 @@ import (
 	"github.com/kuritka/plugin/common/log"
 )
 
-type cmdRunner struct {
+//CmdRunner is running all commands
+type CmdRunner struct {
 	service ICmdRunner
 }
 
 var logger = log.Log
 
-func New(command ICmdRunner) *cmdRunner {
-	return &cmdRunner{
+//New creates new instance of CmdRunner
+func New(command ICmdRunner) *CmdRunner {
+	return &CmdRunner{
 		command,
 	}
 }
 
-//Run service once and panics if service is broken
-func (r *cmdRunner) MustRun() {
+//MustRun runs service once and panics if service is broken
+func (r *CmdRunner) MustRun() {
 	logger.Info().Msgf("command %s started", r.service)
 	err := r.service.Run()
 	guard.FailOnError(err, "command %s failed", r.service)
