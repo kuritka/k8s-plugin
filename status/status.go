@@ -39,11 +39,11 @@ func (s *Status) Run() error {
 	//	return err
 	//}
 	//
+	//package api from k8gb import here...
 	ing, err := clientset.NetworkingV1beta1().Ingresses(s.options.Namespace).List(metav1.ListOptions{})
 	if err != nil {
 		return err
 	}
-
 
 	for _,n := range ing.Items {
 		logger.Info().Msgf("%s %s",n.ClusterName, n.Name)

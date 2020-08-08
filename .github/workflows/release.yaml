@@ -1,0 +1,32 @@
+on:
+  release:
+    types: [published]
+
+name: build on release
+jobs:
+  build:
+    name: Go RELEASE
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+
+      - name: go1.14 linters
+        uses: AbsaOSS/golang-pipeline/go1.14/linter@master
+        with:
+          GOLINT: on
+          #GOLINTPATH: pkg/controller
+
+      - name: go1.14 test
+        uses: AbsaOSS/golang-pipeline/go1.14/test@master
+
+      - name: go1.14 release linux
+        uses: AbsaOSS/golang-pipeline/go1.14/release@master
+        env:
+          #when path is different from root
+          #PROJECT_PATH: "./cmd/manager"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GOOS: linux
+          GOARCH: amd64
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
