@@ -8,7 +8,7 @@ jobs:
       - uses: actions/checkout@master
       - name: go1.14 linters
         uses: AbsaOSS/golang-pipeline/go1.14/linter@master
-#        with:
-#          GOLINT: on
+        with:
+          GOLINT: on
       - name: go1.14 test
         uses: AbsaOSS/golang-pipeline/go1.14/test@master
