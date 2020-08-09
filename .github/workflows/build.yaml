@@ -11,4 +11,6 @@ jobs:
         with:
           args: ./...
       - name: go1.14 linters
-        uses: AbsaOSS/golang-pipeline/go1.13/linter@master
+        uses: AbsaOSS/golang-pipeline/go1.14/linter@master
+      - name: go1.14 tests
+        uses: AbsaOSS/golang-pipeline/go1.14/test@master
