@@ -1,9 +1,8 @@
 name: k8gb-plugin build
-on:
-  push:
-    tags-ignore:
-      - 'v*'
-
+on: push
+#  push:
+#    tags-ignore:
+#      - 'v*'
 
 jobs:
   k8gb-plugin-build:
