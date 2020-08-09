@@ -13,21 +13,21 @@ type K8s struct {
 	ResultingContext     *api.Context
 	ResultingContextName string
 
-	RestConfig		*rest.Config
-	RawConfig		api.Config
+	RestConfig     *rest.Config
+	RawConfig      api.Config
 	ListNamespaces bool
 	genericclioptions.IOStreams
 }
 
 //Command contains command
 type Command struct {
-	Args           []string
+	Args    []string
 	Context context.Context
-	Cancel context.CancelFunc
+	Cancel  context.CancelFunc
 }
 
 //Context contains fill command context
-type Context struct{
-	K8s *K8s
+type Context struct {
+	K8s     *K8s
 	Command *Command
 }

@@ -12,12 +12,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-
 var (
 	logger = log.Log
 
 	//Verbose output
-	 Verbose bool
+	Verbose bool
 )
 
 var rootCmd = &cobra.Command{

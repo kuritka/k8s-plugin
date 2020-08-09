@@ -16,7 +16,7 @@ type Status struct {
 //Options input vars for command
 type Options struct {
 	Namespace string
-	Context *k8sctx2.Context
+	Context   *k8sctx2.Context
 }
 
 var logger = log.Log
@@ -49,8 +49,8 @@ func (s *Status) Run() error {
 		return err
 	}
 
-	for _,n := range ing.Items {
-		logger.Info().Msgf("%s %s",n.ClusterName, n.Name)
+	for _, n := range ing.Items {
+		logger.Info().Msgf("%s %s", n.ClusterName, n.Name)
 	}
 	return nil
 }

@@ -8,7 +8,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-
 var statusOptions status.Options
 
 var statusCmd = &cobra.Command{
@@ -19,8 +18,8 @@ var statusCmd = &cobra.Command{
 
 	Run: func(cmd *cobra.Command, args []string) {
 		var err error
-		statusOptions.Context,err = k8sctx2.NewContextFactory(args).Get()
-		guard.FailOnError(err,"error when building command context")
+		statusOptions.Context, err = k8sctx2.NewContextFactory(args).Get()
+		guard.FailOnError(err, "error when building command context")
 		status := status.New(statusOptions)
 		runner.New(status).MustRun()
 	},
@@ -30,6 +29,6 @@ func init() {
 	//TODO: fix description
 	statusCmd.Flags().StringVarP(&statusOptions.Namespace, "namespace", "n", "default", "k8gb namespace")
 	err := statusCmd.MarkFlagRequired("namespace")
-	guard.FailOnError(err,"namespace required")
+	guard.FailOnError(err, "namespace required")
 	rootCmd.AddCommand(statusCmd)
 }

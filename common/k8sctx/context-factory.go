@@ -20,7 +20,7 @@ func NewContextFactory(args []string) *ContextFactory {
 }
 
 //Get returns context
-func (cf *ContextFactory) Get() ( *Context, error){
+func (cf *ContextFactory) Get() (*Context, error) {
 	var err error
 	ctx := new(Context)
 	ctx.Command = new(Command)
@@ -32,9 +32,9 @@ func (cf *ContextFactory) Get() ( *Context, error){
 	if err != nil {
 		return nil, err
 	}
-	ctx.K8s.RestConfig,err = configFlags.ToRESTConfig()
+	ctx.K8s.RestConfig, err = configFlags.ToRESTConfig()
 	if err != nil {
 		return nil, err
 	}
-	return ctx,nil
+	return ctx, nil
 }
