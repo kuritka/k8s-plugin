@@ -6,8 +6,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: go1.14 lint
-        run: |
-          # https://github.com/golang/lint
-          go get -u golang.org/x/lint/golint
-          make lint
+      - name: Run Gosec Security Scanner
+        uses: securego/gosec@v2.2.0
+        with:
+          args: ./...
+      - name: go1.13 linters
+        uses: AbsaOSS/golang-pipeline/go1.13/linter@master
+        with:
+          GOLINT: on
