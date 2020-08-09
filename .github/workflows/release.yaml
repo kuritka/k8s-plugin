@@ -4,19 +4,21 @@ on:
 
 name: build on release
 jobs:
-  build:
-    name: Go RELEASE
+  k8gb-plugin-release:
+    name: k8gb-plugin release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
 
+      - name: Run Gosec Security Scanner
+        uses: securego/gosec@v2.2.0
+        with:
+          args: ./...
+
       - name: go1.14 linters
         uses: AbsaOSS/golang-pipeline/go1.14/linter@master
-#        with:
-#          GOLINT: on
-          #GOLINTPATH: pkg/controller
 
-      - name: go1.14 test
+      - name: go1.14 tests
         uses: AbsaOSS/golang-pipeline/go1.14/test@master
 
       - name: go1.14 release linux

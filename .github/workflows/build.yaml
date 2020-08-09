@@ -1,8 +1,8 @@
 name: Golang lint and test
 on: push
 jobs:
-  go-test:
-    name: Go Test
+  k8gb-plugin-build:
+    name: k8gb-plugin build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
