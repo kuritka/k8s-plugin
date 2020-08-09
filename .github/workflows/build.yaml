@@ -1,5 +1,6 @@
-name: Golang lint and test
+name: k8gb-plugin build
 on: push
+
 jobs:
   k8gb-plugin-build:
     name: k8gb-plugin build

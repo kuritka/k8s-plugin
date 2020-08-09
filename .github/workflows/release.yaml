@@ -1,8 +1,8 @@
+name: k8gb-plugin release
 on:
   release:
     types: [published]
 
-name: k8gb-plugin release
 jobs:
   k8gb-plugin-release:
     name: k8gb-plugin release
