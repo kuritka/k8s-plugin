@@ -1,10 +1,10 @@
 name: k8gb-plugin release
 on:
-  push:
-    branches:
-      - release
-    tags:
-      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+  release:
+    types: [published]
+#      - release
+#    tags:
+#      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 jobs:
   k8gb-plugin-release:
@@ -25,7 +25,7 @@ jobs:
         uses: AbsaOSS/golang-pipeline/go1.14/test@master
 
       - name: go1.14 release linux
-        uses: AbsaOSS/golang-pipeline/go1.14/release@master
+        uses: kuritka/golang-pipeline/go1.14/release@master
         env:
           #when path is different from root
           #PROJECT_PATH: "./cmd/manager"
