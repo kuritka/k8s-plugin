@@ -32,4 +32,3 @@ func init() {
 	guard.FailOnError(err, "namespace required")
 	rootCmd.AddCommand(statusCmd)
 }
-
