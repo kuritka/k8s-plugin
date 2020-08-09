@@ -1,8 +1,11 @@
 name: k8gb-plugin build
 on:
   push:
-    tags-ignore:
-      - 'v*'
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
   k8gb-plugin-build:
