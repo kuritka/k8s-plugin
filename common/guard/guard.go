@@ -8,8 +8,8 @@ import (
 var logger = log.Log
 
 //FailOnError panics when error occurs.
-func FailOnError(err error, message string, v ...interface{}) {
+func FailOnError(err error, message string, args ...interface{}) {
 	if err != nil {
-		logger.Fatal().Err(err).Msgf(message, v)
+		logger.Fatal().Err(err).Msgf(message, args...)
 	}
 }
