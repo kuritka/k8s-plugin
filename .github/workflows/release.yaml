@@ -4,16 +4,6 @@ on:
     types: [published]
 
 jobs:
-  my-test:
-    runs-on: self-hosted
-    #env:
-    #...
-    steps:
-      - uses: actions/checkout@v2
-      - name: run tests
-        run: |
-          make pre-push
-
   k8gb-plugin-release:
     name: k8gb-plugin release
     runs-on: ubuntu-latest
