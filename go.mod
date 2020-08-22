@@ -1,6 +1,6 @@
 module github.com/kuritka/plugin
 
-go 1.14
+go 1.15
 
 require (
 	github.com/rs/zerolog v1.18.0
@@ -9,6 +9,7 @@ require (
 	k8s.io/apimachinery v0.17.2
 	k8s.io/client-go v0.17.2
 	k8s.io/cli-runtime v0.17.2
+	k8s.io/apiextensions-apiserver v0.17.2 // https://pkg.go.dev/k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1?tab=doc
 )
 
 replace (
