@@ -44,3 +44,9 @@ update `k8s.io/api` version
 https://github.com/vladimirvivien/k8s-client-examples
 https://medium.com/programming-kubernetes/building-stuff-with-the-kubernetes-api-part-4-using-go-b1d0e3c1c899
 https://soggy.space/namespaced-crds-dynamic-client/
+
+
+### Q
+versioning - does each plugin version reflect k8gb version. Something change in k8gb 
+(i.e. geotag as slice). plugin has to reflect . Guards  ? Back compatibility ?? 
+ 
