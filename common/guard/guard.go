@@ -13,4 +13,3 @@ func FailOnError(err error, message string, args ...interface{}) {
 		logger.Fatal().Err(err).Msgf(message, args...)
 	}
 }
-

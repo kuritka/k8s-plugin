@@ -2,7 +2,12 @@ package status
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/kuritka/plugin/common/guard"
+	"github.com/kuritka/plugin/common/k8gb"
+	"github.com/kuritka/plugin/common/log"
+
 	k8sctx2 "github.com/kuritka/plugin/common/k8sctx"
 	"github.com/kyokomi/emoji"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -11,9 +16,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
-	"strings"
-
-	"github.com/kuritka/plugin/common/log"
 )
 
 //StatusInfo command structure
@@ -87,53 +89,13 @@ func (s *Info) String() string {
 	return "Status"
 }
 
-type Metadata struct {
-	Name        string
-	Namespace   string
-	Annotations map[string]string
-}
-
-type Status struct {
-	GeoTag         string
-	HealthyRecords map[string][]string
-	ServiceHealth  map[string]string
-}
-
-type Spec struct {
-	//Ingress map[string][]string
-	Strategy
-}
-
-type Strategy struct {
-	DnsTtlSeconds              string
-	SplitBrainThresholdSeconds string
-	Type                       string
-}
-
-type description struct {
-	Name       string
-	Kind       string
-	Cluster    string
-	ApiVersion string
-	Metadata
-	Status
-	Spec
-}
-
-//gets
-func mapUnstructured(un *unstructured.UnstructuredList) (desc []description) {
-	desc = make([]description, 2)
-	for i, u := range un.Items {
-		d := description{}
-		//d.Name = u.GetName()
-		//d.Kind = fmt.Sprintf("%v", u.Object["kind"])
-		//d.ApiVersion = fmt.Sprintf("%v", u.Object["apiVersion"])
-		//d.Value = fmt.Sprintf("%v", interface(u.Object["metadata"])["name"])
-
-		err := runtime.DefaultUnstructuredConverter.FromUnstructured(u.Object, &d)
-		guard.FailOnError(err, "")
-		//	err := runtime.DefaultUnstructuredConverter.FromUnstructured(map[string](u.Object["metadata"]), &d)
-		//	guard.FailOnError(err, "")
+//maps unstructured data into Desc structure. Any CRD change has to be reflected
+//in Desc or underlying structures
+func mapUnstructured(u *unstructured.UnstructuredList) (desc []k8gb.Desc) {
+	desc = make([]k8gb.Desc, 2)
+	for i, o := range u.Items {
+		d := k8gb.Desc{}
+		d.Error = runtime.DefaultUnstructuredConverter.FromUnstructured(o.Object, &d)
 		desc[i] = d
 	}
 	return
