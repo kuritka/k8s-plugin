@@ -54,5 +54,5 @@ type Path struct {
 
 type Backend struct {
 	ServiceName string
-	ServicePort string
+	ServicePort int64
 }

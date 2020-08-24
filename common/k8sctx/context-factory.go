@@ -2,7 +2,10 @@ package k8sctx
 
 import (
 	"context"
+	"fmt"
 	"os"
+
+	"k8s.io/client-go/dynamic"
 
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
@@ -30,11 +33,15 @@ func (cf *ContextFactory) Get() (*Context, error) {
 	ctx.K8s.IOStreams = genericclioptions.IOStreams{In: os.Stdin, Out: os.Stdout, ErrOut: os.Stderr}
 	ctx.K8s.RawConfig, err = configFlags.ToRawKubeConfigLoader().RawConfig()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("create RawConfig %s", err)
 	}
 	ctx.K8s.RestConfig, err = configFlags.ToRESTConfig()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("create Rest %s", err)
+	}
+	ctx.K8s.DynamicConfig, err = dynamic.NewForConfig(ctx.K8s.RestConfig)
+	if err != nil {
+		return nil, fmt.Errorf("create Dynamic %s", err)
 	}
 	return ctx, nil
 }

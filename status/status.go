@@ -13,7 +13,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 )
@@ -38,35 +37,19 @@ func New(options Options) *Info {
 	}
 }
 
-var (
-	runtimeClassGVR = schema.GroupVersionResource{
-		Group:    "k8gb.absa.oss",
-		Version:  "v1beta1",
-		Resource: "gslbs",
-	}
-)
-
-func printGslb(client dynamic.Interface) {
-	rs := fmt.Sprintf("%s/%s", runtimeClassGVR.Group, runtimeClassGVR.Resource)
-	res := client.Resource(runtimeClassGVR)
-	list, err := res.List(metav1.ListOptions{})
-	guard.FailOnError(err, "reading CRD")
-	r := mapUnstructured(list)
-	fmt.Print(r)
-	logger.Info().Msgf("Printing %s.%s", rs, strings.Join([]string{"spec", "runtimeHandler"}, "."))
-}
-
 //Run runs the command implementation
 func (s *Info) Run() error {
-	emoji.Println(":unicorn:")
-	logger.Info().Msgf(s.options.Namespace)
 	for k := range s.options.Context.K8s.RawConfig.Clusters {
-		logger.Info().Msgf(k)
+		cluster := emoji.Sprint(" :hamburger: ", k)
+		fmt.Println(cluster)
 	}
 	cs, err := kubernetes.NewForConfig(s.options.Context.K8s.RestConfig)
 	if err != nil {
 		return err
 	}
+
+	host := emoji.Sprint(" :sushi: ", s.options.Context.K8s.RestConfig.Host)
+	fmt.Println(host)
 
 	//package api from k8gb import here...
 	ing, err := cs.NetworkingV1beta1().Ingresses(s.options.Namespace).List(metav1.ListOptions{})
@@ -78,9 +61,8 @@ func (s *Info) Run() error {
 		logger.Info().Msgf("%s %s", n.ClusterName, n.Name)
 	}
 
-	dc, err := dynamic.NewForConfig(s.options.Context.K8s.RestConfig)
 	guard.FailOnError(err, "client")
-	printGslb(dc)
+	printGslb(s.options.Context.K8s.DynamicConfig)
 
 	return nil
 }
@@ -89,10 +71,20 @@ func (s *Info) String() string {
 	return "Status"
 }
 
+func printGslb(client dynamic.Interface) {
+	rs := fmt.Sprintf("%s/%s", k8gb.RuntimeClassGVR.Group, k8gb.RuntimeClassGVR.Resource)
+	res := client.Resource(k8gb.RuntimeClassGVR)
+	list, err := res.List(metav1.ListOptions{})
+	guard.FailOnError(err, "reading CRD")
+	r := mapUnstructured(list)
+	fmt.Print(r)
+	logger.Info().Msgf("Printing %s.%s", rs, strings.Join([]string{"spec", "runtimeHandler"}, "."))
+}
+
 //maps unstructured data into Desc structure. Any CRD change has to be reflected
 //in Desc or underlying structures
 func mapUnstructured(u *unstructured.UnstructuredList) (desc []k8gb.Desc) {
-	desc = make([]k8gb.Desc, 2)
+	desc = make([]k8gb.Desc, len(u.Items))
 	for i, o := range u.Items {
 		d := k8gb.Desc{}
 		d.Error = runtime.DefaultUnstructuredConverter.FromUnstructured(o.Object, &d)
