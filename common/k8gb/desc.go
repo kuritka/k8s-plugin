@@ -29,8 +29,8 @@ type Spec struct {
 }
 
 type Strategy struct {
-	DnsTtlSeconds              int64
-	SplitBrainThresholdSeconds int64
+	DnsTtlSeconds              int64 `json:"dnsTtlSeconds,string"`
+	SplitBrainThresholdSeconds int64 `json:"splitBrainThresholdSeconds,string"`
 	Type                       string
 }
 
@@ -54,5 +54,6 @@ type Path struct {
 
 type Backend struct {
 	ServiceName string
-	ServicePort int64
+	//ServicePort TODO:local gslb setup contains value http.thats why stored as string now
+	ServicePort string `json:"servicePort,string"`
 }

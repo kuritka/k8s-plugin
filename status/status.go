@@ -39,16 +39,21 @@ func New(options Options) *Info {
 
 //Run runs the command implementation
 func (s *Info) Run() error {
+	fmt.Println(s.options.Context.K8s.RawConfig.Contexts)
+	fmt.Println(s.options.Context.K8s.RawConfig.CurrentContext)
+	e := s.options.Context.K8s.SwitchContext("kind-test-gslb2")
+	guard.FailOnError(e, "")
+	fmt.Println(s.options.Context.K8s.RawConfig.CurrentContext)
 	for k := range s.options.Context.K8s.RawConfig.Clusters {
 		cluster := emoji.Sprint(" :hamburger: ", k)
 		fmt.Println(cluster)
 	}
-	cs, err := kubernetes.NewForConfig(s.options.Context.K8s.RestConfig)
+	cs, err := kubernetes.NewForConfig(s.options.Context.K8s.ClientConfig)
 	if err != nil {
 		return err
 	}
 
-	host := emoji.Sprint(" :sushi: ", s.options.Context.K8s.RestConfig.Host)
+	host := emoji.Sprint(" :sushi: ", s.options.Context.K8s.ClientConfig.Host)
 	fmt.Println(host)
 
 	//package api from k8gb import here...
