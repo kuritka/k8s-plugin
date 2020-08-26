@@ -3,7 +3,7 @@ module github.com/kuritka/plugin
 go 1.15
 
 require (
-	github.com/kyokomi/emoji v2.2.4+incompatible
+	github.com/enescakir/emoji v1.0.0
 	github.com/rs/zerolog v1.18.0
 	github.com/spf13/cobra v0.0.6
 	k8s.io/api v0.17.2

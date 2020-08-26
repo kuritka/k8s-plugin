@@ -2,7 +2,6 @@ package k8sctx
 
 import (
 	"context"
-	"fmt"
 
 	"k8s.io/client-go/tools/clientcmd"
 
@@ -40,11 +39,19 @@ type Context struct {
 }
 
 func (k *K8s) SwitchContext(ctx string) (err error) {
-	if k.RawConfig.Contexts[ctx] == nil {
-		return fmt.Errorf("context %s doesn't exists", ctx)
+	override := &clientcmd.ConfigOverrides{CurrentContext: ctx}
+	clientConfig := clientcmd.NewNonInteractiveClientConfig(k.RawConfig, override.CurrentContext,
+		override, &clientcmd.ClientConfigLoadingRules{})
+	k.RawConfig, err = clientConfig.RawConfig()
+	if err != nil {
+		return
 	}
-	k.RawConfig.CurrentContext = ctx
-	return clientcmd.ModifyConfig(clientcmd.NewDefaultPathOptions(), k.RawConfig, true)
+	k.ClientConfig, err = clientConfig.ClientConfig()
+	if err != nil {
+		return
+	}
+	k.DynamicConfig, err = dynamic.NewForConfig(k.ClientConfig)
+	return
 }
 
 //TearDown would be primarily deferred

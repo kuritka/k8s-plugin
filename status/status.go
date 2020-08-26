@@ -3,12 +3,12 @@ package status
 import (
 	"fmt"
 
+	"github.com/enescakir/emoji"
 	"github.com/kuritka/plugin/common/guard"
 	"github.com/kuritka/plugin/common/k8gb"
+	k8sctx2 "github.com/kuritka/plugin/common/k8sctx"
 	"github.com/kuritka/plugin/common/log"
 
-	k8sctx2 "github.com/kuritka/plugin/common/k8sctx"
-	"github.com/kyokomi/emoji"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -40,6 +40,7 @@ func New(options Options) *Info {
 func (s *Info) Run() error {
 	fmt.Println(s.options.Context.K8s.RawConfig.Contexts)
 	fmt.Println(s.options.Context.K8s.RawConfig.CurrentContext)
+	printGslb(s.options.Context.K8s.DynamicConfig)
 	e := s.options.Context.K8s.SwitchContext("kind-test-gslb2")
 	defer func() {
 		fmt.Println("Switch context back...")
@@ -70,8 +71,6 @@ func (s *Info) Run() error {
 	for _, n := range ing.Items {
 		logger.Info().Msgf("%s %s", n.ClusterName, n.Name)
 	}
-
-	guard.FailOnError(err, "client")
 	printGslb(s.options.Context.K8s.DynamicConfig)
 
 	return nil
@@ -87,7 +86,8 @@ func printGslb(client dynamic.Interface) {
 	guard.FailOnError(err, "reading CRD")
 	r := mapUnstructured(list)
 	for _, ru := range r {
-		fmt.Println(emoji.Sprint(" :octopus:", ru.Kind+" - "+ru.Metadata.Name))
+		s := fmt.Sprintf("%v %s %s", emoji.Unicorn, ru.Metadata.Name, ru.Status.GeoTag)
+		fmt.Println(s)
 	}
 }
 
