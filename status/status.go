@@ -7,7 +7,6 @@ import (
 	"github.com/kuritka/plugin/common/guard"
 	"github.com/kuritka/plugin/common/k8gb"
 	k8sctx2 "github.com/kuritka/plugin/common/k8sctx"
-	"github.com/kuritka/plugin/common/log"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -26,8 +25,6 @@ type Options struct {
 	Context   *k8sctx2.Context
 }
 
-var logger = log.Log
-
 //New returns Status service implementation
 func New(options Options) *Info {
 	return &Info{
@@ -45,6 +42,8 @@ func (s *Info) Run() error {
 	printGslb(s.options.Context.K8s.DynamicConfig)
 	return nil
 }
+
+//func print
 
 func (s *Info) String() string {
 	return "Status"

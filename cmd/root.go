@@ -5,7 +5,10 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
+
+	"github.com/enescakir/emoji"
 
 	"github.com/kuritka/plugin/common/log"
 
@@ -31,7 +34,8 @@ var rootCmd = &cobra.Command{
 		}
 	},
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
-		logger.Info().Msg("done..")
+		fmt.Printf(" bye! %v\n", emoji.CrossedFingers)
+		//logger.Info().Msg("done..")
 	},
 }
 

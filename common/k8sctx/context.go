@@ -2,6 +2,7 @@ package k8sctx
 
 import (
 	"context"
+	"fmt"
 
 	"k8s.io/client-go/tools/clientcmd"
 
@@ -38,23 +39,19 @@ type Context struct {
 	Command *Command
 }
 
+//SwitchContext switches inmemory kubectl context
 func (k *K8s) SwitchContext(ctx string) (err error) {
-	override := &clientcmd.ConfigOverrides{CurrentContext: ctx}
-	clientConfig := clientcmd.NewNonInteractiveClientConfig(k.RawConfig, override.CurrentContext,
-		override, &clientcmd.ClientConfigLoadingRules{})
-	k.RawConfig, err = clientConfig.RawConfig()
-	if err != nil {
-		return
+	if k.RawConfig.Contexts[ctx] == nil {
+		return fmt.Errorf("context %s doesn't exists", ctx)
 	}
+	override := &clientcmd.ConfigOverrides{CurrentContext: ctx, Context: *k.RawConfig.Contexts[ctx]}
+	clientConfig := clientcmd.NewNonInteractiveClientConfig(k.RawConfig, ctx,
+		override, &clientcmd.ClientConfigLoadingRules{})
+	k.RawConfig.CurrentContext = ctx
 	k.ClientConfig, err = clientConfig.ClientConfig()
 	if err != nil {
 		return
 	}
 	k.DynamicConfig, err = dynamic.NewForConfig(k.ClientConfig)
 	return
-}
-
-//TearDown would be primarily deferred
-func (k *K8s) TearDown() error {
-	return k.SwitchContext(k.ctxBackup)
 }
