@@ -44,8 +44,7 @@ func (k *K8s) SwitchContext(ctx string) (err error) {
 		return fmt.Errorf("context %s doesn't exists", ctx)
 	}
 	k.RawConfig.CurrentContext = ctx
-	err = clientcmd.ModifyConfig(clientcmd.NewDefaultPathOptions(), k.RawConfig, true)
-	return
+	return clientcmd.ModifyConfig(clientcmd.NewDefaultPathOptions(), k.RawConfig, true)
 }
 
 //TearDown would be primarily deferred

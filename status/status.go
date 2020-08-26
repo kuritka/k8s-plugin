@@ -44,7 +44,7 @@ func (s *Info) Run() error {
 	defer func() {
 		fmt.Println("Switch context back...")
 		err := s.options.Context.K8s.TearDown()
-		guard.FailOnError(err, "unable to switch back context")
+		guard.FailOnError(err, "unable to switch back context back. Plugin created .lock file next to your kube config. Please remove that file manually")
 	}()
 
 	guard.FailOnError(e, "")
