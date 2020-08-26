@@ -44,5 +44,6 @@ func (cf *ContextFactory) Get() (*Context, error) {
 	if err != nil {
 		return nil, fmt.Errorf("create Dynamic %s", err)
 	}
+	ctx.K8s.ctxBackup = ctx.K8s.RawConfig.CurrentContext
 	return ctx, nil
 }

@@ -2,6 +2,7 @@ package k8sctx
 
 import (
 	"context"
+	"fmt"
 
 	"k8s.io/client-go/tools/clientcmd"
 
@@ -21,6 +22,7 @@ type K8s struct {
 	RawConfig      api.Config
 	ListNamespaces bool
 	genericclioptions.IOStreams
+	ctxBackup  string
 	kubeConfig string
 }
 
@@ -37,11 +39,16 @@ type Context struct {
 	Command *Command
 }
 
-func (k K8s) SwitchContext(ctx string) (err error) {
-	cfg := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
-		&clientcmd.ClientConfigLoadingRules{ExplicitPath: k.kubeConfig},
-		&clientcmd.ConfigOverrides{CurrentContext: ctx})
-	k.RawConfig, err = cfg.RawConfig()
-	k.ClientConfig, err = cfg.ClientConfig()
+func (k *K8s) SwitchContext(ctx string) (err error) {
+	if k.RawConfig.Contexts[ctx] == nil {
+		return fmt.Errorf("context %s doesn't exists", ctx)
+	}
+	k.RawConfig.CurrentContext = ctx
+	err = clientcmd.ModifyConfig(clientcmd.NewDefaultPathOptions(), k.RawConfig, true)
 	return
+}
+
+//TearDown would be primarily deferred
+func (k *K8s) TearDown() error {
+	return k.SwitchContext(k.ctxBackup)
 }

@@ -2,7 +2,6 @@ package status
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/kuritka/plugin/common/guard"
 	"github.com/kuritka/plugin/common/k8gb"
@@ -42,6 +41,12 @@ func (s *Info) Run() error {
 	fmt.Println(s.options.Context.K8s.RawConfig.Contexts)
 	fmt.Println(s.options.Context.K8s.RawConfig.CurrentContext)
 	e := s.options.Context.K8s.SwitchContext("kind-test-gslb2")
+	defer func() {
+		fmt.Println("Switch context back...")
+		err := s.options.Context.K8s.TearDown()
+		guard.FailOnError(err, "unable to switch back context")
+	}()
+
 	guard.FailOnError(e, "")
 	fmt.Println(s.options.Context.K8s.RawConfig.CurrentContext)
 	for k := range s.options.Context.K8s.RawConfig.Clusters {
@@ -77,13 +82,13 @@ func (s *Info) String() string {
 }
 
 func printGslb(client dynamic.Interface) {
-	rs := fmt.Sprintf("%s/%s", k8gb.RuntimeClassGVR.Group, k8gb.RuntimeClassGVR.Resource)
 	res := client.Resource(k8gb.RuntimeClassGVR)
 	list, err := res.List(metav1.ListOptions{})
 	guard.FailOnError(err, "reading CRD")
 	r := mapUnstructured(list)
-	fmt.Print(r)
-	logger.Info().Msgf("Printing %s.%s", rs, strings.Join([]string{"spec", "runtimeHandler"}, "."))
+	for _, ru := range r {
+		fmt.Println(emoji.Sprint(" :octopus:", ru.Kind+" - "+ru.Metadata.Name))
+	}
 }
 
 //maps unstructured data into Desc structure. Any CRD change has to be reflected

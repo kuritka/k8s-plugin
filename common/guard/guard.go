@@ -2,14 +2,16 @@
 package guard
 
 import (
-	"github.com/kuritka/plugin/common/log"
+	"fmt"
+
+	"github.com/kyokomi/emoji"
 )
 
-var logger = log.Log
+//var logger = log.Log
 
 //FailOnError panics when error occurs.
 func FailOnError(err error, message string, args ...interface{}) {
 	if err != nil {
-		logger.Fatal().Err(err).Msgf(message, args...)
+		fmt.Println(emoji.Sprintf(":error: ", message, err.Error()))
 	}
 }

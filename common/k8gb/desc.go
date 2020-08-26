@@ -1,7 +1,6 @@
 package k8gb
 
 type Desc struct {
-	Name       string
 	Kind       string
 	Cluster    string
 	ApiVersion string
