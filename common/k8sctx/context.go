@@ -24,6 +24,7 @@ type K8s struct {
 	genericclioptions.IOStreams
 	ctxBackup  string
 	kubeConfig string
+	Cluster    string
 }
 
 //Command contains command

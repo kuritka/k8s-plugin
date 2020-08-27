@@ -31,6 +31,7 @@ func (cf *ContextFactory) Get() (*Context, error) {
 	ctx.Command.Context, ctx.Command.Cancel = context.WithCancel(context.Background())
 	ctx.K8s = new(K8s)
 	ctx.K8s.kubeConfig = *configFlags.KubeConfig
+	ctx.K8s.Cluster = *configFlags.ClusterName
 	ctx.K8s.IOStreams = genericclioptions.IOStreams{In: os.Stdin, Out: os.Stdout, ErrOut: os.Stderr}
 	ctx.K8s.RawConfig, err = configFlags.ToRawKubeConfigLoader().RawConfig()
 	if err != nil {

@@ -2,8 +2,9 @@ package status
 
 import (
 	"fmt"
+	"github.com/kuritka/plugin/status/internal/printer"
+	"time"
 
-	"github.com/enescakir/emoji"
 	"github.com/kuritka/plugin/common/guard"
 	"github.com/kuritka/plugin/common/k8gb"
 	k8sctx2 "github.com/kuritka/plugin/common/k8sctx"
@@ -11,7 +12,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/client-go/dynamic"
 )
 
 //StatusInfo command structure
@@ -33,31 +33,49 @@ func New(options Options) *Info {
 }
 
 //Run runs the command implementation
-func (s *Info) Run() error {
-	printGslb(s.options.Context.K8s.DynamicConfig)
-	fmt.Println(s.options.Context.K8s.RawConfig.CurrentContext)
-	e := s.options.Context.K8s.SwitchContext("kind-test-gslb2")
-	guard.FailOnError(e, "")
-	fmt.Println(s.options.Context.K8s.RawConfig.CurrentContext)
-	printGslb(s.options.Context.K8s.DynamicConfig)
-	return nil
+func (s *Info) Run() (err error) {
+	go func() {
+		p := printer.DefaultPrettyPrinter()
+		ticker := time.Tick(3 * time.Second)
+		for {
+			p.Clear()
+			gslb := s.getGslb()
+			<-ticker
+			guard.HandleError(p.Title("context: " +s.options.Context.K8s.RawConfig.CurrentContext))
+			for _,g := range gslb {
+				guard.HandleError(p.Subtitle(fmt.Sprintf("%s (%s)",g.Metadata.Name, g.Metadata.Namespace)))
+				guard.HandleError(p.Property("Type",g.Type))
+				guard.HandleError(p.Property("GeoTag",g.GeoTag))
+				guard.HandleError(p.Property("DnsTTL",fmt.Sprintf("%v s",g.DnsTtlSeconds)))
+				guard.HandleError(p.Property("SplitBrain",fmt.Sprintf("%v s",g.SplitBrainThresholdSeconds)))
+			}
+			p.Flush()
+		}
+	}()
+	_,err = fmt.Scanln()
+	return err
 }
 
-//func print
 
+//printGslb(s.options.Context.K8s.DynamicConfig)
+	//fmt.Println(s.options.Context.K8s.RawConfig.CurrentContext)
+	//e := s.options.Context.K8s.SwitchContext("kind-test-gslb2")
+	//guard.FailOnError(e, "")
+	//fmt.Println(s.options.Context.K8s.RawConfig.CurrentContext)
+	//printGslb(s.options.Context.K8s.DynamicConfig)
+	//return nil
+
+
+//func print
 func (s *Info) String() string {
 	return "Status"
 }
 
-func printGslb(client dynamic.Interface) {
-	res := client.Resource(k8gb.RuntimeClassGVR)
+func (s *Info) getGslb() (gslb []k8gb.Desc){
+	res := s.options.Context.K8s.DynamicConfig.Resource(k8gb.RuntimeClassGVR)
 	list, err := res.List(metav1.ListOptions{})
 	guard.FailOnError(err, "reading CRD")
-	r := mapUnstructured(list)
-	for _, ru := range r {
-		s := fmt.Sprintf("%v %s %s", emoji.Unicorn, ru.Metadata.Name, ru.Status.GeoTag)
-		fmt.Println(s)
-	}
+	return mapUnstructured(list)
 }
 
 //maps unstructured data into Desc structure. Any CRD change has to be reflected
