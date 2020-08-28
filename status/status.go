@@ -37,17 +37,23 @@ func (s *Info) Run() (err error) {
 	go func() {
 		p := printer.DefaultPrettyPrinter()
 		ticker := time.Tick(3 * time.Second)
+		p.Clear()
 		for {
-			p.Clear()
 			gslb := s.getGslb()
 			<-ticker
 			guard.HandleError(p.Title("context: " +s.options.Context.K8s.RawConfig.CurrentContext))
 			for _,g := range gslb {
-				guard.HandleError(p.Subtitle(fmt.Sprintf("%s (%s)",g.Metadata.Name, g.Metadata.Namespace)))
+				guard.HandleError(p.Subtitle(fmt.Sprintf("%s %s:%s in namespace: %s",g.Metadata.Name, g.ApiVersion,g.Kind, g.Metadata.Namespace)))
 				guard.HandleError(p.Property("Type",g.Type))
 				guard.HandleError(p.Property("GeoTag",g.GeoTag))
-				guard.HandleError(p.Property("DnsTTL",fmt.Sprintf("%v s",g.DnsTtlSeconds)))
-				guard.HandleError(p.Property("SplitBrain",fmt.Sprintf("%v s",g.SplitBrainThresholdSeconds)))
+				guard.HandleError(p.Property("DnsTTL",intToSec(g.DnsTtlSeconds)))
+				guard.HandleError(p.Property("SplitBrain",intToSec(g.SplitBrainThresholdSeconds)))
+				guard.HandleError(p.PropertyMap("Health", g.ServiceHealth))
+				for k,h := range g.HealthyRecords {
+					guard.HandleError(p.PropertySlice(k, h))
+				}
+
+				p.NewLine()
 			}
 			p.Flush()
 		}
@@ -57,14 +63,12 @@ func (s *Info) Run() (err error) {
 }
 
 
-//printGslb(s.options.Context.K8s.DynamicConfig)
-	//fmt.Println(s.options.Context.K8s.RawConfig.CurrentContext)
-	//e := s.options.Context.K8s.SwitchContext("kind-test-gslb2")
-	//guard.FailOnError(e, "")
-	//fmt.Println(s.options.Context.K8s.RawConfig.CurrentContext)
-	//printGslb(s.options.Context.K8s.DynamicConfig)
-	//return nil
-
+func intToSec(v int64) string{
+	if v == 0 {
+		return fmt.Sprintf(" - ")
+	}
+	return fmt.Sprintf("%vs",v)
+}
 
 //func print
 func (s *Info) String() string {
