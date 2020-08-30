@@ -34,7 +34,7 @@ var rootCmd = &cobra.Command{
 		}
 	},
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
-		fmt.Printf(" bye! %v\n", emoji.CrossedFingers)
+		fmt.Printf("\n\n bye! %v\n\n", emoji.CrossedFingers)
 		//logger.Info().Msg("done..")
 	},
 }

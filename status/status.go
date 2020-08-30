@@ -2,12 +2,10 @@ package status
 
 import (
 	"fmt"
-	"github.com/kuritka/plugin/status/internal/printer"
-	"time"
-
 	"github.com/kuritka/plugin/common/guard"
 	"github.com/kuritka/plugin/common/k8gb"
 	k8sctx2 "github.com/kuritka/plugin/common/k8sctx"
+	"github.com/kuritka/plugin/status/internal/printer"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -34,32 +32,24 @@ func New(options Options) *Info {
 
 //Run runs the command implementation
 func (s *Info) Run() (err error) {
-	go func() {
-		p := printer.DefaultPrettyPrinter()
-		ticker := time.Tick(3 * time.Second)
-		p.Clear()
-		for {
-			gslb := s.getGslb()
-			<-ticker
-			guard.HandleError(p.Title("context: " +s.options.Context.K8s.RawConfig.CurrentContext))
-			for _,g := range gslb {
-				guard.HandleError(p.Subtitle(fmt.Sprintf("%s %s:%s in namespace: %s",g.Metadata.Name, g.ApiVersion,g.Kind, g.Metadata.Namespace)))
-				guard.HandleError(p.Property("Type",g.Type))
-				guard.HandleError(p.Property("GeoTag",g.GeoTag))
-				guard.HandleError(p.Property("DnsTTL",intToSec(g.DnsTtlSeconds)))
-				guard.HandleError(p.Property("SplitBrain",intToSec(g.SplitBrainThresholdSeconds)))
-				guard.HandleError(p.PropertyMap("Health", g.ServiceHealth))
-				for k,h := range g.HealthyRecords {
-					guard.HandleError(p.PropertySlice(k, h))
-				}
-
-				p.NewLine()
-			}
-			p.Flush()
+	p := printer.DefaultPrettyPrinter()
+	gslb := s.getGslb()
+	guard.HandleError(p.Title(fmt.Sprintf("context: %s (%s)",s.options.Context.K8s.RawConfig.CurrentContext,s.options.Context.K8s.ClientConfig.Host)))
+	for _,g := range gslb {
+		guard.HandleError(p.Subtitle(fmt.Sprintf("%s %s:%s in namespace: %s",g.Metadata.Name, g.ApiVersion,g.Kind, g.Metadata.Namespace)))
+		guard.HandleError(p.Property("Type",g.Type))
+		guard.HandleError(p.Property("GeoTag",g.GeoTag))
+		guard.HandleError(p.Property("DnsTTL",intToSec(g.DnsTtlSeconds)))
+		guard.HandleError(p.Property("SplitBrain",intToSec(g.SplitBrainThresholdSeconds)))
+		guard.HandleError(p.PropertyMap("Health", g.ServiceHealth))
+		for k,h := range g.HealthyRecords {
+			guard.HandleError(p.PropertySlice(k, h))
 		}
-	}()
-	_,err = fmt.Scanln()
-	return err
+
+
+		p.NewLine()
+	}
+	return
 }
 
 

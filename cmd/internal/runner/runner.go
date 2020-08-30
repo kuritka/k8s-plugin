@@ -21,7 +21,6 @@ func New(command ICmdRunner) *CmdRunner {
 
 //MustRun runs service once and panics if service is broken
 func (r *CmdRunner) MustRun() {
-	logger.Info().Msgf("command %s started", r.service)
 	err := r.service.Run()
 	guard.FailOnError(err, "command %s failed", r.service)
 }
