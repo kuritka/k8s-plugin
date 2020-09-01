@@ -27,8 +27,8 @@ var statusCmd = &cobra.Command{
 
 func init() {
 	//TODO: fix description
-	//statusCmd.Flags().StringVarP(&statusOptions.Namespace, "namespace", "n", "default", "k8gb namespace")
-	//err := statusCmd.MarkFlagRequired("namespace")
-	//guard.FailOnError(err, "namespace required")
+	statusCmd.Flags().StringVarP(&statusOptions.Namespace, "namespace", "n", "default", "k8gb namespace")
+	err := statusCmd.MarkFlagRequired("namespace")
+	guard.FailOnError(err, "namespace required")
 	rootCmd.AddCommand(statusCmd)
 }

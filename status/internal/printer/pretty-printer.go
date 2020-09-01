@@ -2,16 +2,16 @@ package printer
 
 import (
 	"fmt"
-	"github.com/enescakir/emoji"
-	"github.com/logrusorgru/aurora"
 	"io"
 	"os"
+
+	"github.com/enescakir/emoji"
+	"github.com/logrusorgru/aurora"
 )
 
 type PrettyPrinter struct {
 	out io.Writer
 }
-
 
 func DefaultPrettyPrinter() *PrettyPrinter {
 	return &PrettyPrinter{

@@ -1,6 +1,6 @@
 package k8gb
 
-type Desc struct {
+type GslbRaw struct {
 	Kind       string
 	Cluster    string
 	ApiVersion string
