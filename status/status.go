@@ -6,6 +6,7 @@ import (
 	"github.com/kuritka/plugin/common/k8gb"
 	k8sctx2 "github.com/kuritka/plugin/common/k8sctx"
 	"github.com/kuritka/plugin/status/internal/printer"
+	"github.com/kuritka/plugin/status/internal/viewmodel"
 	"k8s.io/client-go/kubernetes"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -33,19 +34,25 @@ func New(options Options) *Info {
 
 //Run runs the command implementation
 func (s *Info) Run() (err error) {
-
+	x,err := viewmodel.NewViewModel(s.options.Context.K8s)
+	if err != nil {
+		return err
+	}
+	g,err := x.GetRawGslbs()
+	if len(g) == 0 {
+		return
+	}
 	cs, err := kubernetes.NewForConfig(s.options.Context.K8s.ClientConfig)
 	if err != nil {
 		return err
 	}
 	ing,err :=cs.NetworkingV1beta1().Ingresses(s.options.Namespace).List(metav1.ListOptions{})
 
-
 	p := printer.DefaultPrettyPrinter()
 	gslb := s.getGslb()
 	guard.HandleError(p.Title(fmt.Sprintf("context: %s (%s)",s.options.Context.K8s.RawConfig.CurrentContext,s.options.Context.K8s.ClientConfig.Host)))
 	for _,g := range gslb {
-		guard.HandleError(p.Subtitle(fmt.Sprintf("%s %s:%s in namespace: %s",g.Metadata.Na§me, g.ApiVersion,g.Kind, g.Metadata.Namespace)))
+		guard.HandleError(p.Subtitle(fmt.Sprintf("%s %s:%s in namespace: %s",g.Metadata.Name, g.ApiVersion,g.Kind, g.Metadata.Namespace)))
 		guard.HandleError(p.Property("Type",g.Type))
 		guard.HandleError(p.Property("GeoTag",g.GeoTag))
 		guard.HandleError(p.Property("DnsTTL",intToSec(g.DnsTtlSeconds)))
@@ -61,7 +68,6 @@ func (s *Info) Run() (err error) {
 	}
 	return
 }
-
 
 func intToSec(v int64) string{
 	if v == 0 {
