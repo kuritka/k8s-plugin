@@ -2,8 +2,11 @@ package viewmodel
 
 import (
 	"fmt"
+
 	"github.com/kuritka/plugin/common/k8gb"
 	"github.com/kuritka/plugin/common/k8sctx"
+
+	//"github.com/hashicorp/go-multierror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -23,9 +26,18 @@ func NewViewModel(k8s *k8sctx.K8s) (vm *ViewModel, err error) {
 	return
 }
 
-func (vm *ViewModel) GetRawGslbs() (graw map[string][]k8gb.GslbRaw, err error) {
+func (vm *ViewModel) GetModel() (model map[string]map[string]k8gb.GslbModel, err error) {
+	raw, err := vm.getRawGslbs()
+	if err != nil {
+		return
+	}
+	model, err = vm.mapToGslbModel(raw)
+	return
+}
+
+func (vm *ViewModel) getRawGslbs() (raws map[string][]k8gb.GslbRaw, err error) {
 	var unstructuredList *unstructured.UnstructuredList
-	graw = make(map[string][]k8gb.GslbRaw,0)
+	raws = make(map[string][]k8gb.GslbRaw,0)
 	for _, ctx := range vm.k8s.RawConfig.Contexts {
 		err = vm.k8s.SwitchContext(ctx.Cluster)
 		if err != nil {
@@ -35,7 +47,19 @@ func (vm *ViewModel) GetRawGslbs() (graw map[string][]k8gb.GslbRaw, err error) {
 		if err != nil {
 			return
 		}
-		graw[ctx.Cluster] = mapUnstructured(unstructuredList)
+		raws[ctx.Cluster] = getUnstructured(unstructuredList)
+	}
+	return
+}
+
+func (vm *ViewModel) mapToGslbModel(r map[string][]k8gb.GslbRaw) (m map[string]map[string]k8gb.GslbModel, err error) {
+	m = make(map[string]map[string]k8gb.GslbModel,len(r))
+	for cluster, gslbRaws := range r {
+		m[cluster] = make(map[string]k8gb.GslbModel, len(gslbRaws))
+		for _, raw := range gslbRaws {
+			//TODO: inject validator
+			m[cluster][raw.Metadata.Name] = k8gb.NewMapper(raw).Map()
+		}
 	}
 	return
 }
@@ -43,7 +67,7 @@ func (vm *ViewModel) GetRawGslbs() (graw map[string][]k8gb.GslbRaw, err error) {
 
 //maps unstructured data into GslbRaw structure. Any CRD change has to be reflected
 //in GslbRaw or underlying structures
-func mapUnstructured(u *unstructured.UnstructuredList) (desc []k8gb.GslbRaw) {
+func getUnstructured(u *unstructured.UnstructuredList) (desc []k8gb.GslbRaw) {
 	desc = make([]k8gb.GslbRaw, len(u.Items))
 	for i, o := range u.Items {
 		d := k8gb.GslbRaw{}
@@ -54,6 +78,3 @@ func mapUnstructured(u *unstructured.UnstructuredList) (desc []k8gb.GslbRaw) {
 }
 
 
-func (vm *ViewModel) GetModel() k8gb.GslbExtended {
-	return k8gb.GslbExtended{}
-}

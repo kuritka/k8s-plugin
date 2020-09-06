@@ -1,6 +1,6 @@
 package k8gb
 
-type GslbExtended struct {
+type GslbModel struct {
 	Kind                       Stringr
 	Cluster                    Stringr
 	ApiVersion                 Stringr
